@@ -26,5 +26,17 @@
     "duration": 49.0,
     "status": "failed",
     "reason": "unaudited_client_can_only_post_to_private_accounts: Please review our integration guidelines at https://developers.tiktok.com/doc/content-sharing-guidelines/ (log_id=20261121232326EF8612A4E7A73B130EAA, HTTP 403)"
+  },
+  {
+    "created_at": "2026-11-21T15:48:08+00:00",
+    "title": "Считай всех на опушке",
+    "topic": "деревня и лес",
+    "hook_style": "интрига",
+    "caption": "Вы бы пересчитали всех на опушке? Как думаете, кто был четвёртым?\nВымышленная история.\n#мистика #страшныеистории #деревня #лес #историиотподписчиц #тикток",
+    "duration": 43.8,
+    "publish_id": "v_inbox_file~v2.7710651882705373205",
+    "status": "published",
+    "posted_at": "2026-11-21T15:48:38+00:00",
+    "via": "inbox"
   }
 ]
