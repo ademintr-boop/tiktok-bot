@@ -23,7 +23,7 @@ jobs:
         env:
           TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
           TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
-          TIKTOK_REDIRECT_URI: ${{ vars.TIKTOK_REDIRECT_URI }}
+          TIKTOK_REDIRECT_URI: ${{ vars.TIKTOK_REDIRECT_URI || 'https://ademintr-boop.github.io/tiktok-bot/callback.html' }}
           GH_PAT: ${{ secrets.GH_PAT }}
           CODE: ${{ inputs.code }}
         run: |

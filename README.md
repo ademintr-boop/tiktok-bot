@@ -32,8 +32,7 @@
 
 ### 3. Страница для авторизации (GitHub Pages)
 - **Settings → Pages → Branch: `main`, папка `/docs` → Save.**
-- Адрес приёмника будет таким: `https://ВАШ_ЛОГИН.github.io/ИМЯ_РЕПО/callback.html`
-- **Settings → Secrets and variables → Actions → Variables** → создайте переменную `TIKTOK_REDIRECT_URI` с этим адресом.
+- Адрес приёмника: `https://ademintr-boop.github.io/tiktok-bot/callback.html` (уже прописан в боте).
 
 > На бесплатном тарифе GitHub Pages работает только для публичных репозиториев. Секреты при этом всё равно никто не видит. Если нужен приватный бот, создайте отдельный публичный репозиторий только с `callback.html`.
 
