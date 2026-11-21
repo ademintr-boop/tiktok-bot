@@ -1,16 +1,26 @@
-Тема: ночная смена
-Сценарий: Охранник в лифте
+Статистика обновлена: 0 видео, подписчиков 0
+Тема: звонки и сообщения с неизвестных номеров
+Сценарий: Звонок в три ноль три
 Озвучка…
 Озвучка: edge-tts ru-RU-SvetlanaNeural
 Фоновые ролики…
 Рендер MP4…
-  сцена 1/8: 5.1 c
-  сцена 2/8: 6.5 c
-  сцена 3/8: 8.7 c
-  сцена 4/8: 6.1 c
-  сцена 5/8: 5.8 c
-  сцена 6/8: 7.8 c
-  сцена 7/8: 2.8 c
-  сцена 8/8: 4.3 c
-Готово: /home/runner/work/tiktok-bot/tiktok-bot/out/20261121-105011/video.mp4 (5.2 МБ, 46 с)
-Публикация выключена или нет TIKTOK_REFRESH_TOKEN — только рендер
+  сцена 1/8: 5.4 c
+  сцена 2/8: 5.0 c
+  сцена 3/8: 3.9 c
+  сцена 4/8: 7.0 c
+  сцена 5/8: 6.1 c
+  сцена 6/8: 6.9 c
+  сцена 7/8: 9.7 c
+  сцена 8/8: 5.7 c
+Готово: /home/runner/work/tiktok-bot/tiktok-bot/out/20261121-152207/video.mp4 (6.5 МБ, 49 с)
+Traceback (most recent call last):
+  File "/home/runner/work/tiktok-bot/tiktok-bot/bot/main.py", line 99, in cmd_run
+    res = tiktok.publish_video(token, video, caption, cfg)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tiktok-bot/tiktok-bot/bot/tiktok.py", line 153, in publish_video
+    data = _check(requests.post(f"{API}/post/publish/video/init/", headers=_headers(token), json=body, timeout=60))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/tiktok-bot/tiktok-bot/bot/tiktok.py", line 27, in _check
+    raise TikTokError(f"{err.get('code')}: {err.get('message')} (log_id={err.get('log_id')}, HTTP {r.status_code})")
+bot.tiktok.TikTokError: unaudited_client_can_only_post_to_private_accounts: Please review our integration guidelines at https://developers.tiktok.com/doc/content-sharing-guidelines/ (log_id=20261121232326EF8612A4E7A73B130EAA, HTTP 403)

@@ -16,5 +16,15 @@
     "caption": "Вы бы обернулись на скрип двери? Пишите честно 👇\nВымышленная история.\n#мистика #страшныеистории #ночнаясмена #историиотпервоголица #тикток #историинаночь",
     "duration": 46.3,
     "status": "dry_run"
+  },
+  {
+    "created_at": "2026-11-21T15:23:25+00:00",
+    "title": "Звонок в три ноль три",
+    "topic": "звонки и сообщения с неизвестных номеров",
+    "hook_style": "интрига",
+    "caption": "Я бы позвонила... а вы? Ответили бы себе из будущего? 👀\nВымышленная история.\n#мистика #страшныеистории #неизвестныйномер #историинаночь #тикток",
+    "duration": 49.0,
+    "status": "failed",
+    "reason": "unaudited_client_can_only_post_to_private_accounts: Please review our integration guidelines at https://developers.tiktok.com/doc/content-sharing-guidelines/ (log_id=20261121232326EF8612A4E7A73B130EAA, HTTP 403)"
   }
 ]
