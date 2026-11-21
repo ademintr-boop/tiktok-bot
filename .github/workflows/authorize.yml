@@ -45,6 +45,6 @@ jobs:
         run: |
           git config user.name "tiktok-bot"
           git config user.email "tiktok-bot@users.noreply.github.com"
-          git add data/tiktok_token.enc reports/auth_url.txt reports/auth_log.txt 2>/dev/null || true
+          for f in data/tiktok_token.enc reports/auth_url.txt reports/auth_log.txt; do [ -f "$f" ] && git add "$f"; done; true
           git diff --cached --quiet || git commit -m "bot: токен TikTok (зашифрован)"
           git pull --rebase -q && git push -q
