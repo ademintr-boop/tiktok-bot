@@ -1,0 +1,64 @@
+name: 🎬 Публикация ролика
+
+on:
+  schedule:
+    # Время в UTC. 06:17 и 15:47 UTC = 09:17 и 18:47 по Стамбулу/Москве
+    - cron: "17 6 * * *"
+    - cron: "47 15 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tiktok-bot
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка ffmpeg и шрифтов
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+
+      - run: pip install -r requirements.txt
+
+      - name: Сгенерировать и опубликовать
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: python -m bot.main run
+
+      - name: Сохранить ролик (доступен 14 дней во вкладке Actions)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-${{ github.run_number }}
+          path: |
+            out/*/video.mp4
+            out/*/caption.txt
+            out/*/story.json
+            out/*/subs.srt
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Сохранить историю и отчёт
+        if: always()
+        run: |
+          git config user.name "tiktok-bot"
+          git config user.email "tiktok-bot@users.noreply.github.com"
+          git add data reports 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "bot: публикация $(date -u +%F_%H%M)"
+          git pull --rebase -q && git push -q || true

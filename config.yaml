@@ -1,0 +1,59 @@
+# ===== Настройки ИИ-блогера =====
+# Меняйте этот файл прямо на GitHub (карандаш «Edit») — ПК не нужен.
+
+channel:
+  name: "Тёмные истории"
+  language: "ru"
+  # Описание ниши для генератора сюжетов
+  niche: >
+    Короткие вымышленные мистические истории с неожиданной концовкой,
+    рассказанные от первого лица, как будто это случилось с подписчиком.
+  # Пул тем. Бот сам смещается к темам, которые набирают больше просмотров.
+  topics:
+    - заброшенные места
+    - странные соседи
+    - ночная смена
+    - старые фотографии
+    - звонки и сообщения с неизвестных номеров
+    - деревня и лес
+    - поезда и вокзалы
+    - сны, которые сбываются
+  # Доля экспериментов: с этой вероятностью тема выбирается случайно,
+  # чтобы бот не застревал на одной (epsilon-greedy).
+  explore_rate: 0.3
+  # Обязательная пометка в подписи — истории вымышленные
+  disclaimer: "Вымышленная история."
+  base_hashtags: ["#мистика", "#страшныеистории", "#историинаночь"]
+
+story:
+  model: "claude-sonnet-5-5"
+  target_seconds: 50          # длительность ролика (45–60 с лучше всего удерживают)
+  words_per_minute: 165       # для оценки длины текста
+
+voice:
+  engine: "edge"              # бесплатные нейроголоса Microsoft (edge-tts)
+  name: "ru-RU-DmitryNeural"  # или ru-RU-SvetlanaNeural
+  rate: "+8%"
+  pitch: "-2Hz"
+
+video:
+  width: 1080
+  height: 1920
+  fps: 30
+  # Фоновые ролики берутся со стоков Pexels (нужен бесплатный ключ PEXELS_API_KEY).
+  # Без ключа — анимированный градиент.
+  background: "pexels"
+  music_volume: 0.12          # громкость музыки из assets/music (если есть)
+  font: "DejaVu Sans"
+  subtitle_words_per_chunk: 3
+
+publish:
+  enabled: true               # false = только рендер, без публикации
+  # PUBLIC_TO_EVERYONE | MUTUAL_FOLLOW_FRIENDS | FOLLOWER_OF_CREATOR | SELF_ONLY
+  # Пока приложение TikTok не прошло аудит, TikTok принудительно публикует как SELF_ONLY.
+  privacy_level: "PUBLIC_TO_EVERYONE"
+  disable_comment: false
+  disable_duet: false
+  disable_stitch: false
+  is_aigc: true               # метка «Создано ИИ» — требование правил TikTok
+  max_posts_per_day: 3

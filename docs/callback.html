@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Код авторизации TikTok</title>
+<style>
+  body { font-family: system-ui, sans-serif; background:#111; color:#eee; display:flex; min-height:100vh;
+         align-items:center; justify-content:center; margin:0; padding:20px; box-sizing:border-box; }
+  .card { max-width:520px; width:100%; background:#1c1c1c; border-radius:16px; padding:24px; }
+  textarea { width:100%; box-sizing:border-box; height:110px; background:#000; color:#7fffa0; border:1px solid #333;
+             border-radius:8px; padding:10px; font-family:monospace; font-size:13px; }
+  button { margin-top:12px; width:100%; padding:14px; border:0; border-radius:10px; background:#fe2c55; color:#fff;
+           font-size:16px; font-weight:600; }
+  .err { color:#ff8080; }
+  p { line-height:1.5; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>Авторизация TikTok</h2>
+  <div id="out"></div>
+</div>
+<script>
+  const q = new URLSearchParams(location.search);
+  const out = document.getElementById('out');
+  const code = q.get('code');
+  if (code) {
+    out.innerHTML = `<p>Скопируйте код и вставьте его в поле <b>code</b> при запуске workflow
+      «🔑 Авторизация TikTok» в вашем репозитории. Код одноразовый и действует несколько минут.</p>
+      <textarea id="c" readonly></textarea><button id="b">Скопировать</button>`;
+    const ta = document.getElementById('c');
+    ta.value = code;
+    document.getElementById('b').onclick = async () => {
+      try { await navigator.clipboard.writeText(code); } catch (e) { ta.select(); document.execCommand('copy'); }
+      document.getElementById('b').textContent = 'Скопировано ✓';
+    };
+    history.replaceState(null, '', location.pathname);  // убрать код из адресной строки
+  } else {
+    const err = q.get('error_description') || q.get('error') || 'Код не получен.';
+    out.innerHTML = '<p class="err"></p>';
+    out.querySelector('.err').textContent = err;
+  }
+</script>
+</body>
+</html>

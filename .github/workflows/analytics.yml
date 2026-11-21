@@ -1,0 +1,39 @@
+name: 📊 Статистика
+
+on:
+  schedule:
+    - cron: "3 19 * * *"   # раз в день, 22:03 по Стамбулу
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tiktok-bot
+  cancel-in-progress: false
+
+jobs:
+  analytics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Обновить статистику и отчёт
+        env:
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: python -m bot.main analytics
+      - name: Сохранить
+        run: |
+          git config user.name "tiktok-bot"
+          git config user.email "tiktok-bot@users.noreply.github.com"
+          git add data reports 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "bot: статистика $(date -u +%F)"
+          git pull --rebase -q && git push -q || true

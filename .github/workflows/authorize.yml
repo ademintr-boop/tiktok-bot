@@ -1,0 +1,35 @@
+name: 🔑 Авторизация TikTok
+
+# Запуск 1: поле code пустое → в отчёте запуска появится ссылка авторизации.
+# Запуск 2: вставьте код со страницы-приёмника → бот сохранит токен в секреты.
+on:
+  workflow_dispatch:
+    inputs:
+      code:
+        description: "Код авторизации (оставьте пустым, чтобы получить ссылку)"
+        required: false
+        default: ""
+
+jobs:
+  auth:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests PyYAML
+      - name: Авторизация
+        env:
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REDIRECT_URI: ${{ vars.TIKTOK_REDIRECT_URI }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          CODE: ${{ inputs.code }}
+        run: |
+          if [ -z "$CODE" ]; then
+            python -m bot.main auth-url
+          else
+            echo "::add-mask::$CODE"
+            python -m bot.main auth-exchange "$CODE"
+          fi
