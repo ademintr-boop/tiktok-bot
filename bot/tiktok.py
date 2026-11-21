@@ -102,6 +102,17 @@ def access_token() -> str:
     return tok["access_token"]
 
 
+def revoke() -> None:
+    """Отозвать доступ (все токены) и удалить сохранённый токен."""
+    tok = access_token()
+    r = requests.post(f"{API}/oauth/revoke/", headers={"Content-Type": "application/x-www-form-urlencoded"},
+                      data={"client_key": env("TIKTOK_CLIENT_KEY", required=True),
+                            "client_secret": env("TIKTOK_CLIENT_SECRET", required=True), "token": tok}, timeout=30)
+    log(f"Отзыв доступа: HTTP {r.status_code}")
+    if TOKEN_FILE.exists():
+        TOKEN_FILE.unlink()
+
+
 def _headers(token: str) -> dict:
     return {"Authorization": f"Bearer {token}", "Content-Type": "application/json; charset=UTF-8"}
 

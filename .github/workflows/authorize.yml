@@ -10,7 +10,7 @@ on:
         required: false
         default: ""
   push:
-    paths: [".auth", ".auth_code"]
+    paths: [".auth", ".auth_code", ".revoke"]
 
 permissions:
   contents: write
@@ -31,16 +31,21 @@ jobs:
           TIKTOK_REDIRECT_URI: ${{ vars.TIKTOK_REDIRECT_URI || 'https://ademintr-boop.github.io/tiktok-bot/callback.html' }}
           CODE: ${{ inputs.code }}
         run: |
+          mkdir -p reports
+          if [ -s .revoke ]; then
+            python -m bot.main auth-revoke 2>&1 | grep -v '::add-mask::' > reports/auth_log.txt || true
+            : > .revoke
+            git rm -q --cached data/tiktok_token.enc 2>/dev/null || true
+          fi
           if [ -z "$CODE" ] && [ -s .auth_code ]; then CODE=$(tr -d ' \n\r' < .auth_code); fi
           if [ -z "$CODE" ]; then
             mkdir -p reports
-            python -m bot.main auth-url > reports/auth_log.txt 2>&1 || true
+            python -m bot.main auth-url 2>&1 | grep -v '::add-mask::' > reports/auth_log.txt || true
             grep -o 'https://www.tiktok.com/v2/auth/authorize/[^ ]*' reports/auth_log.txt | tail -1 > reports/auth_url.txt || true
             cat reports/auth_log.txt
           else
             echo "::add-mask::$CODE"
-            python -m bot.main auth-exchange "$CODE" > reports/auth_log.txt 2>&1 || true
-            cat reports/auth_log.txt
+            python -m bot.main auth-exchange "$CODE" 2>&1 | tee /dev/stderr | grep -v '::add-mask::' > reports/auth_log.txt || true
             : > .auth_code
           fi
       - name: Сохранить
@@ -48,6 +53,7 @@ jobs:
         run: |
           git config user.name "tiktok-bot"
           git config user.email "tiktok-bot@users.noreply.github.com"
-          mkdir -p reports; for f in data/tiktok_token.enc reports/auth_url.txt reports/auth_log.txt .auth_code; do [ -f "$f" ] && git add "$f"; done; true
+          mkdir -p reports; for f in data/tiktok_token.enc reports/auth_url.txt reports/auth_log.txt .auth_code .revoke; do [ -f "$f" ] && git add "$f"; done; true
+          [ -f data/tiktok_token.enc ] || git rm -q --cached data/tiktok_token.enc 2>/dev/null || true
           git diff --cached --quiet || git commit -m "bot: токен TikTok (зашифрован)"
           git pull --rebase -q && git push -q

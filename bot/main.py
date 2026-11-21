@@ -149,6 +149,10 @@ def main() -> int:
         summary(f"### Шаг 1. Откройте ссылку и разрешите доступ\n\n[Авторизовать TikTok]({url})\n\n"
                 "Затем скопируйте код со страницы-приёмника и запустите этот workflow ещё раз, вставив код.")
         return 0
+    if cmd == "auth-revoke":
+        from . import tiktok
+        tiktok.revoke()
+        return 0
     if cmd == "auth-exchange":
         from . import tiktok
         tok = tiktok.exchange_code(sys.argv[2])
