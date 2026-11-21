@@ -1,1 +1,2 @@
-https://www.tiktok.com/v2/auth/authorize/?client_key=sbawkjh5jmyebpnzu3&scope=user.info.basic%2Cuser.info.stats%2Cvideo.list%2Cvideo.publish&response_type=code&redirect_uri=https%3A%2F%2Fademintr-boop.github.io%2Ftiktok-bot%2Fcallback.html&state=84d107350ea7845b
+Токен TikTok сохранён (в зашифрованном виде)
+Готово: бот подключён к TikTok
