@@ -96,11 +96,15 @@ def cmd_run() -> int:
     if publish:
         from . import tiktok
         try:
-            res = tiktok.publish_video(token, video, caption, cfg)
+            if cfg["publish"].get("mode", "direct") == "inbox":
+                res = tiktok.send_to_inbox(token, video)
+            else:
+                res = tiktok.publish_video(token, video, caption, cfg)
             record.update(res)
             record["posted_at"] = now_iso()
-            if res["status"] == "processing":  # TikTok ещё обрабатывает — считаем опубликованным
+            if res["status"] in ("processing", "in_inbox"):
                 record["status"] = "published"
+                record["via"] = "inbox" if cfg["publish"].get("mode") == "inbox" else "direct"
         except Exception as e:
             record.update(status="failed", reason=str(e)[:500])
             traceback.print_exc()
@@ -112,6 +116,10 @@ def cmd_run() -> int:
     history.append(record)
     save_history(history)
     analytics.write_report()
+    if record.get("via") == "inbox":
+        from .config import REPORTS
+        REPORTS.mkdir(exist_ok=True)
+        (REPORTS / "caption.txt").write_text(caption, encoding="utf-8")
     summary(f"### 🎬 {story['title']}\nТема: {topic} · {duration:.0f} c · статус: **{record['status']}**"
             f"{' (' + record.get('privacy', '') + ')' if record.get('privacy') else ''}\n\n```\n{caption}\n```")
     return code

@@ -33,6 +33,17 @@ def sync(token: str) -> dict:
             v = next((x for x in videos if key and key in (x.get("video_description") or x.get("title") or "").lower()), None)
             if v:
                 item["video_id"] = str(v["id"])
+        if not v and item.get("via") == "inbox":  # подпись вводит человек — ищем первый ролик после отправки
+            try:
+                t0 = datetime.fromisoformat(item["created_at"]).timestamp()
+            except (KeyError, ValueError):
+                t0 = 0
+            taken = {str(h.get("video_id")) for h in history if h.get("video_id")}
+            cand = sorted((x for x in videos if x.get("create_time", 0) >= t0 and str(x["id"]) not in taken),
+                          key=lambda x: x.get("create_time", 0))
+            if cand:
+                v = cand[0]
+                item["video_id"] = str(v["id"])
         if v:
             item["stats"] = {k: v.get(k, 0) for k in ("view_count", "like_count", "comment_count", "share_count")}
             item["share_url"] = v.get("share_url")

@@ -10,7 +10,7 @@ import requests
 from .config import env, log, mask
 
 API = "https://open.tiktokapis.com/v2"
-SCOPES = "user.info.basic,user.info.stats,video.list,video.publish"
+SCOPES = "user.info.basic,user.info.stats,video.list,video.publish,video.upload"
 
 
 class TikTokError(RuntimeError):
@@ -166,6 +166,52 @@ def publish_video(token: str, video: Path, caption: str, cfg: dict) -> dict:
                 raise TikTokError(f"Загрузка куска {i + 1}/{count}: HTTP {r.status_code} {r.text[:200]}")
     log(f"Видео загружено, publish_id={publish_id}")
     return {"publish_id": publish_id, "privacy": privacy, **wait_status(token, publish_id)}
+
+
+def _chunks(size: int) -> tuple[int, int]:
+    if size <= 64 * 1024 * 1024:
+        return size, 1
+    chunk = 10 * 1024 * 1024
+    return chunk, size // chunk
+
+
+def _upload(upload_url: str, video: Path, size: int, chunk: int, count: int) -> None:
+    with open(video, "rb") as f:
+        for i in range(count):
+            start = i * chunk
+            end = size - 1 if i == count - 1 else start + chunk - 1
+            f.seek(start)
+            payload = f.read(end - start + 1)
+            r = requests.put(upload_url, data=payload, timeout=300, headers={
+                "Content-Type": "video/mp4", "Content-Length": str(len(payload)),
+                "Content-Range": f"bytes {start}-{end}/{size}"})
+            if r.status_code not in (200, 201, 206):
+                raise TikTokError(f"Загрузка куска {i + 1}/{count}: HTTP {r.status_code} {r.text[:200]}")
+
+
+def send_to_inbox(token: str, video: Path) -> dict:
+    """Отправить ролик во «Входящие» TikTok: владелец открывает уведомление и жмёт «Опубликовать»."""
+    size = video.stat().st_size
+    chunk, count = _chunks(size)
+    data = _check(requests.post(f"{API}/post/publish/inbox/video/init/", headers=_headers(token), timeout=60,
+                                json={"source_info": {"source": "FILE_UPLOAD", "video_size": size,
+                                                      "chunk_size": chunk, "total_chunk_count": count}}))
+    _upload(data["upload_url"], video, size, chunk, count)
+    publish_id = data["publish_id"]
+    log(f"Видео загружено во «Входящие», publish_id={publish_id}")
+    deadline = time.time() + 300
+    status = "processing"
+    while time.time() < deadline:
+        d = _check(requests.post(f"{API}/post/publish/status/fetch/", headers=_headers(token),
+                                 json={"publish_id": publish_id}, timeout=30))
+        st = d.get("status")
+        if st in ("SEND_TO_USER_INBOX", "PUBLISH_COMPLETE"):
+            status = "in_inbox"
+            break
+        if st == "FAILED":
+            return {"publish_id": publish_id, "status": "failed", "reason": d.get("fail_reason")}
+        time.sleep(8)
+    return {"publish_id": publish_id, "status": status}
 
 
 def wait_status(token: str, publish_id: str, timeout_s: int = 600) -> dict:

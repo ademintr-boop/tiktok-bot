@@ -50,6 +50,9 @@ video:
 
 publish:
   enabled: true               # false = только рендер, без публикации
+  # inbox  = ролик приходит во «Входящие» TikTok, вы жмёте «Опубликовать» (работает без аудита, видно всем)
+  # direct = бот публикует сам (без аудита TikTok — только в закрытый аккаунт и только для вас)
+  mode: "inbox"
   # PUBLIC_TO_EVERYONE | MUTUAL_FOLLOW_FRIENDS | FOLLOWER_OF_CREATOR | SELF_ONLY
   # Пока приложение TikTok не прошло аудит, TikTok принудительно публикует как SELF_ONLY.
   privacy_level: "PUBLIC_TO_EVERYONE"
