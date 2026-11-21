@@ -1,7 +1,7 @@
-Тема: заброшенные места
-Невалидный ответ модели: Expecting value: line 1 column 1 (char 0)
-Невалидный ответ модели: Expecting ',' delimiter: line 28 column 6 (char 1124)
-Невалидный ответ модели: Expecting value: line 1 column 1 (char 0)
+Тема: звонки и сообщения с неизвестных номеров
+Claude API 400: {"type":"error","error":{"type":"invalid_request_error","message":"tool_choice: type \"tool\" and \"any\" are not supported for this model."},"request_id":"req_011ChFwNEzN2Ntm3CiATRLhv"}
+Claude API 400: {"type":"error","error":{"type":"invalid_request_error","message":"tool_choice: type \"tool\" and \"any\" are not supported for this model."},"request_id":"req_011ChFwNFj223nFCoariiTA5"}
+Claude API 400: {"type":"error","error":{"type":"invalid_request_error","message":"tool_choice: type \"tool\" and \"any\" are not supported for this model."},"request_id":"req_011ChFwNGSvFurnbQh6uLDAw"}
 Traceback (most recent call last):
   File "<frozen runpy>", line 198, in _run_module_as_main
   File "<frozen runpy>", line 88, in _run_code
@@ -14,6 +14,6 @@ Traceback (most recent call last):
   File "/home/runner/work/tiktok-bot/tiktok-bot/bot/main.py", line 81, in cmd_run
     story = story_mod.generate_story(cfg, topic, analytics.insights(history), [h["title"] for h in history])
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tiktok-bot/tiktok-bot/bot/story.py", line 87, in generate_story
+  File "/home/runner/work/tiktok-bot/tiktok-bot/bot/story.py", line 119, in generate_story
     raise RuntimeError(last_err)
-RuntimeError: Невалидный ответ модели: Expecting value: line 1 column 1 (char 0)
+RuntimeError: Claude API 400: {"type":"error","error":{"type":"invalid_request_error","message":"tool_choice: type \"tool\" and \"any\" are not supported for this model."},"request_id":"req_011ChFwNGSvFurnbQh6uLDAw"}
