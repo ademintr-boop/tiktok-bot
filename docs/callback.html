@@ -39,7 +39,6 @@
       try { await navigator.clipboard.writeText(code); } catch (e) { ta.select(); document.execCommand('copy'); }
       document.getElementById('b').textContent = 'Скопировано ✓';
     };
-    history.replaceState(null, '', location.pathname);  // убрать код из адресной строки
   } else {
     const err = q.get('error_description') || q.get('error') || 'Код не получен.';
     out.innerHTML = '<p class="err"></p>';

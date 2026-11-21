@@ -10,7 +10,7 @@ on:
         required: false
         default: ""
   push:
-    paths: [".auth"]
+    paths: [".auth", ".auth_code"]
 
 permissions:
   contents: write
@@ -31,6 +31,7 @@ jobs:
           TIKTOK_REDIRECT_URI: ${{ vars.TIKTOK_REDIRECT_URI || 'https://ademintr-boop.github.io/tiktok-bot/callback.html' }}
           CODE: ${{ inputs.code }}
         run: |
+          if [ -z "$CODE" ] && [ -s .auth_code ]; then CODE=$(tr -d ' \n\r' < .auth_code); fi
           if [ -z "$CODE" ]; then
             mkdir -p reports
             python -m bot.main auth-url > reports/auth_log.txt 2>&1 || true
@@ -38,13 +39,15 @@ jobs:
             cat reports/auth_log.txt
           else
             echo "::add-mask::$CODE"
-            python -m bot.main auth-exchange "$CODE"
+            python -m bot.main auth-exchange "$CODE" > reports/auth_log.txt 2>&1 || true
+            cat reports/auth_log.txt
+            : > .auth_code
           fi
       - name: Сохранить
         if: always()
         run: |
           git config user.name "tiktok-bot"
           git config user.email "tiktok-bot@users.noreply.github.com"
-          for f in data/tiktok_token.enc reports/auth_url.txt reports/auth_log.txt; do [ -f "$f" ] && git add "$f"; done; true
+          mkdir -p reports; for f in data/tiktok_token.enc reports/auth_url.txt reports/auth_log.txt .auth_code; do [ -f "$f" ] && git add "$f"; done; true
           git diff --cached --quiet || git commit -m "bot: токен TikTok (зашифрован)"
           git pull --rebase -q && git push -q
