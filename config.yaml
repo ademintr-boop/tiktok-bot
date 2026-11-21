@@ -27,14 +27,14 @@ channel:
 
 story:
   model: "claude-sonnet-5-5"
-  target_seconds: 50          # длительность ролика (45–60 с лучше всего удерживают)
+  target_seconds: 42          # длительность ролика (45–60 с лучше всего удерживают)
   words_per_minute: 165       # для оценки длины текста
 
 voice:
   engine: "edge"              # бесплатные нейроголоса Microsoft (edge-tts)
-  name: "ru-RU-DmitryNeural"  # или ru-RU-SvetlanaNeural
-  rate: "+8%"
-  pitch: "-2Hz"
+  name: "ru-RU-SvetlanaNeural"  # ru-RU-DmitryNeural сейчас не отвечает облачным серверам
+  rate: "+10%"
+  pitch: "+0Hz"
 
 video:
   width: 1080

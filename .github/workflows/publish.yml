@@ -46,6 +46,18 @@ jobs:
           set -o pipefail
           python -m bot.main run 2>&1 | tee run.log
 
+      - name: Превью кадров
+        if: always()
+        run: |
+          V=$(ls out/*/video.mp4 2>/dev/null | head -1)
+          if [ -n "$V" ]; then
+            mkdir -p reports
+            ffmpeg -v error -y -ss 1 -i "$V" -frames:v 1 -vf scale=270:-1 f1.png
+            ffmpeg -v error -y -ss 12 -i "$V" -frames:v 1 -vf scale=270:-1 f2.png
+            ffmpeg -v error -y -ss 25 -i "$V" -frames:v 1 -vf scale=270:-1 f3.png
+            ffmpeg -v error -y -i f1.png -i f2.png -i f3.png -filter_complex hstack=3 -q:v 4 reports/preview.jpg
+          fi
+
       - name: Журнал запуска (без секретов)
         if: always()
         env:

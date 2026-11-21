@@ -62,7 +62,7 @@ def build_prompt(cfg: dict, topic: str, insights: str, recent_titles: list[str])
     return f"""Ниша канала: {ch['niche'].strip()}
 Язык: {ch['language']}
 Тема этого ролика: {topic}
-Объём текста для озвучки: примерно {words} слов (≈{st['target_seconds']} секунд), 5–8 сцен.
+Объём текста для озвучки: СТРОГО не больше {words} слов (≈{st['target_seconds']} секунд), 5–8 сцен.
 
 Что показывает статистика канала:
 {insights or '(данных пока мало — экспериментируй с крючками)'}
