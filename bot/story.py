@@ -90,11 +90,11 @@ def generate_story(cfg: dict, topic: str, insights: str, recent_titles: list[str
             headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"},
             json={
                 "model": cfg["story"]["model"],
-                "max_tokens": 2000,
+                "max_tokens": 16000,
                 "system": SYSTEM,
                 "messages": [{"role": "user", "content": prompt}],
                 "tools": [TOOL],
-                "tool_choice": {"type": "tool", "name": "submit_story"},
+                "tool_choice": {"type": "auto"},
             },
             timeout=120,
         )
@@ -105,11 +105,13 @@ def generate_story(cfg: dict, topic: str, insights: str, recent_titles: list[str
         body = r.json()
         try:
             block = next((b for b in body.get("content", []) if b.get("type") == "tool_use"), None)
-            if not block:
-                raise ValueError(f"нет tool_use, stop_reason={body.get('stop_reason')}")
-            story = block["input"]
-            if isinstance(story, str):
-                story = _extract_json(story)
+            if block:
+                story = block["input"]
+            else:
+                text = "".join(b.get("text", "") for b in body.get("content", []) if b.get("type") == "text")
+                if "{" not in text:
+                    raise ValueError(f"пустой ответ, stop_reason={body.get('stop_reason')}")
+                story = _extract_json(text)
             validate(story)
             story["topic"] = topic
             return story
