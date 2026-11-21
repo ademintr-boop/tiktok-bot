@@ -65,20 +65,37 @@ def exchange_code(code: str) -> dict:
     return tok
 
 
+TOKEN_FILE = Path(__file__).resolve().parent.parent / "data" / "tiktok_token.enc"
+
+
+def _openssl(args: list[str], data: bytes) -> bytes:
+    key = env("TIKTOK_CLIENT_SECRET", required=True)
+    return subprocess.run(["openssl", "enc", "-aes-256-cbc", "-pbkdf2", "-iter", "200000", "-a", "-A", *args,
+                           "-pass", "env:TOKEN_PASS"], input=data, capture_output=True, check=True,
+                          env={**os.environ, "TOKEN_PASS": key}).stdout
+
+
 def store_refresh_token(token: str) -> None:
-    """Сохраняет refresh-токен в секрет репозитория (нужен GH_PAT с правом Secrets: write)."""
-    pat, repo = env("GH_PAT"), env("GITHUB_REPOSITORY")
-    if not (pat and repo):
-        log("GH_PAT не задан — не могу обновить секрет TIKTOK_REFRESH_TOKEN автоматически")
-        return
-    subprocess.run(["gh", "secret", "set", "TIKTOK_REFRESH_TOKEN", "--repo", repo],
-                   input=token, text=True, check=True, env={**os.environ, "GH_TOKEN": pat},
-                   capture_output=True)
-    log("Секрет TIKTOK_REFRESH_TOKEN обновлён")
+    """Сохраняет refresh-токен зашифрованным (AES-256, ключ = Client secret) в data/tiktok_token.enc."""
+    TOKEN_FILE.parent.mkdir(exist_ok=True)
+    TOKEN_FILE.write_bytes(_openssl(["-salt"], token.encode()))
+    log("Токен TikTok сохранён (в зашифрованном виде)")
+
+
+def load_refresh_token() -> str | None:
+    if env("TIKTOK_REFRESH_TOKEN"):
+        return env("TIKTOK_REFRESH_TOKEN")
+    if TOKEN_FILE.exists() and env("TIKTOK_CLIENT_SECRET"):
+        tok = _openssl(["-d"], TOKEN_FILE.read_bytes()).decode().strip()
+        mask(tok)
+        return tok
+    return None
 
 
 def access_token() -> str:
-    refresh = env("TIKTOK_REFRESH_TOKEN", required=True)
+    refresh = load_refresh_token()
+    if not refresh:
+        raise SystemExit("TikTok не подключён: запустите workflow «Авторизация TikTok»")
     tok = _token_request({"grant_type": "refresh_token", "refresh_token": refresh})
     if tok.get("refresh_token") and tok["refresh_token"] != refresh:
         store_refresh_token(tok["refresh_token"])

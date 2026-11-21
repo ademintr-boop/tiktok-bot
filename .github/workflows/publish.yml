@@ -41,7 +41,6 @@ jobs:
           TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
           TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
           TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
-          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           set -o pipefail
           python -m bot.main run 2>&1 | tee run.log
@@ -65,13 +64,12 @@ jobs:
           S2: ${{ secrets.PEXELS_API_KEY }}
           S3: ${{ secrets.TIKTOK_CLIENT_SECRET }}
           S4: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
-          S5: ${{ secrets.GH_PAT }}
         run: |
           mkdir -p reports
           python - <<'PY'
           import os, re
           log = open("run.log", encoding="utf-8", errors="replace").read() if os.path.exists("run.log") else "нет журнала"
-          for k in ("S1", "S2", "S3", "S4", "S5"):
+          for k in ("S1", "S2", "S3", "S4"):
               v = os.environ.get(k)
               if v and len(v) > 6:
                   log = log.replace(v, "***")

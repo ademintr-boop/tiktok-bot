@@ -45,19 +45,14 @@
 
 Начать можно в режиме **Sandbox**: добавьте свой аккаунт в *Target users*.
 
-### 5. Токен GitHub для самообновления
-Он нужен, чтобы бот сам сохранял новый токен TikTok.
-- github.com → Settings → Developer settings → **Fine-grained tokens** → Generate.
-- Repository access: только этот репозиторий. Permissions → **Secrets: Read and write**.
-
 ### 6. Секреты
 В репозитории: **Settings → Secrets and variables → Actions → New repository secret**:
-`ANTHROPIC_API_KEY`, `PEXELS_API_KEY`, `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`, `GH_PAT`
+`ANTHROPIC_API_KEY`, `PEXELS_API_KEY`, `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`
 
 ### 7. Подключение TikTok-аккаунта
 1. Откройте **Actions → 🔑 Авторизация TikTok → Run workflow** с пустым полем. В отчёте запуска появится ссылка.
 2. Откройте её, войдите в TikTok и разрешите доступ. Страница покажет код, скопируйте его.
-3. Снова запустите **Run workflow** и вставьте код. Бот сам создаст секрет `TIKTOK_REFRESH_TOKEN`.
+3. Снова запустите **Run workflow** и вставьте код. Бот сохранит токен в `data/tiktok_token.enc` в зашифрованном виде (ключ — Client secret).
 
 ### 8. Проверка
 - В `config.yaml` поставьте `publish.enabled: false` и запустите **🎬 Публикация ролика** вручную.

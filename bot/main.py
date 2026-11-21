@@ -65,7 +65,8 @@ def cmd_run() -> int:
         log("Дневной лимит публикаций достигнут — пропускаю")
         return 0
 
-    publish = cfg["publish"]["enabled"] and bool(env("TIKTOK_REFRESH_TOKEN"))
+    from . import tiktok as _tt
+    publish = cfg["publish"]["enabled"] and bool(_tt.load_refresh_token())
     token = None
     if publish:
         from . import tiktok
@@ -151,7 +152,7 @@ def main() -> int:
     if cmd == "auth-exchange":
         from . import tiktok
         tok = tiktok.exchange_code(sys.argv[2])
-        ok = "Готово: бот авторизован" if env("GH_PAT") else "Токен получен, но GH_PAT не задан — секрет не сохранён"
+        ok = "Готово: бот подключён к TikTok"
         log(ok)
         summary(f"### {ok}\nСрок действия refresh-токена: {int(tok.get('refresh_expires_in', 0)) // 86400} дней. "
                 "Если TikTok выдаёт новый токен, бот сохраняет его сам; по истечении срока запустите авторизацию заново.")

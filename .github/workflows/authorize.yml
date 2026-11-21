@@ -10,6 +10,9 @@ on:
         required: false
         default: ""
 
+permissions:
+  contents: write
+
 jobs:
   auth:
     runs-on: ubuntu-latest
@@ -24,7 +27,6 @@ jobs:
           TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
           TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
           TIKTOK_REDIRECT_URI: ${{ vars.TIKTOK_REDIRECT_URI || 'https://ademintr-boop.github.io/tiktok-bot/callback.html' }}
-          GH_PAT: ${{ secrets.GH_PAT }}
           CODE: ${{ inputs.code }}
         run: |
           if [ -z "$CODE" ]; then
@@ -33,3 +35,11 @@ jobs:
             echo "::add-mask::$CODE"
             python -m bot.main auth-exchange "$CODE"
           fi
+      - name: Сохранить зашифрованный токен
+        if: inputs.code != ''
+        run: |
+          git config user.name "tiktok-bot"
+          git config user.email "tiktok-bot@users.noreply.github.com"
+          git add data/tiktok_token.enc
+          git diff --cached --quiet || git commit -m "bot: токен TikTok (зашифрован)"
+          git pull --rebase -q && git push -q
