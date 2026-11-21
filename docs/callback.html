@@ -29,7 +29,10 @@
   if (code) {
     out.innerHTML = `<p>Скопируйте код и вставьте его в поле <b>code</b> при запуске workflow
       «🔑 Авторизация TikTok» в вашем репозитории. Код одноразовый и действует несколько минут.</p>
-      <textarea id="c" readonly></textarea><button id="b">Скопировать</button>`;
+      <textarea id="c" readonly></textarea><button id="b">1. Скопировать код</button>
+      <a href="https://github.com/ademintr-boop/tiktok-bot/actions/workflows/authorize.yml" target="_blank"
+         style="display:block;text-align:center;margin-top:12px;padding:14px;border-radius:10px;background:#2ea44f;color:#fff;font-weight:600;text-decoration:none">2. Открыть GitHub и вставить код</a>
+      <p style="font-size:14px;color:#aaa">На GitHub: кнопка <b>Run workflow</b> → вставьте код в поле → зелёная кнопка <b>Run workflow</b>.</p>`;
     const ta = document.getElementById('c');
     ta.value = code;
     document.getElementById('b').onclick = async () => {

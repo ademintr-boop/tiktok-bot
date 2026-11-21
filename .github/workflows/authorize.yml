@@ -9,6 +9,8 @@ on:
         description: "Код авторизации (оставьте пустым, чтобы получить ссылку)"
         required: false
         default: ""
+  push:
+    paths: [".auth"]
 
 permissions:
   contents: write
@@ -30,16 +32,17 @@ jobs:
           CODE: ${{ inputs.code }}
         run: |
           if [ -z "$CODE" ]; then
-            python -m bot.main auth-url
+            mkdir -p reports
+            python -m bot.main auth-url | tail -1 > reports/auth_url.txt
+            cat reports/auth_url.txt
           else
             echo "::add-mask::$CODE"
             python -m bot.main auth-exchange "$CODE"
           fi
-      - name: Сохранить зашифрованный токен
-        if: inputs.code != ''
+      - name: Сохранить
         run: |
           git config user.name "tiktok-bot"
           git config user.email "tiktok-bot@users.noreply.github.com"
-          git add data/tiktok_token.enc
+          git add data/tiktok_token.enc reports/auth_url.txt 2>/dev/null || true
           git diff --cached --quiet || git commit -m "bot: токен TikTok (зашифрован)"
           git pull --rebase -q && git push -q
