@@ -1,19 +1,18 @@
-Тема: звонки и сообщения с неизвестных номеров
-Claude API 400: {"type":"error","error":{"type":"invalid_request_error","message":"tool_choice: type \"tool\" and \"any\" are not supported for this model."},"request_id":"req_011ChFwNEzN2Ntm3CiATRLhv"}
-Claude API 400: {"type":"error","error":{"type":"invalid_request_error","message":"tool_choice: type \"tool\" and \"any\" are not supported for this model."},"request_id":"req_011ChFwNFj223nFCoariiTA5"}
-Claude API 400: {"type":"error","error":{"type":"invalid_request_error","message":"tool_choice: type \"tool\" and \"any\" are not supported for this model."},"request_id":"req_011ChFwNGSvFurnbQh6uLDAw"}
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/home/runner/work/tiktok-bot/tiktok-bot/bot/main.py", line 164, in <module>
-    sys.exit(main())
-             ^^^^^^
-  File "/home/runner/work/tiktok-bot/tiktok-bot/bot/main.py", line 139, in main
-    return cmd_run()
-           ^^^^^^^^^
-  File "/home/runner/work/tiktok-bot/tiktok-bot/bot/main.py", line 81, in cmd_run
-    story = story_mod.generate_story(cfg, topic, analytics.insights(history), [h["title"] for h in history])
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/tiktok-bot/tiktok-bot/bot/story.py", line 119, in generate_story
-    raise RuntimeError(last_err)
-RuntimeError: Claude API 400: {"type":"error","error":{"type":"invalid_request_error","message":"tool_choice: type \"tool\" and \"any\" are not supported for this model."},"request_id":"req_011ChFwNGSvFurnbQh6uLDAw"}
+Тема: поезда и вокзалы
+Сценарий: Третий путь
+Озвучка…
+edge-tts ru-RU-DmitryNeural: NoAudioReceived: No audio was received. Please verify that your parameters are correct.
+edge-tts ru-RU-DmitryNeural: NoAudioReceived: No audio was received. Please verify that your parameters are correct.
+Озвучка: edge-tts ru-RU-SvetlanaNeural
+Фоновые ролики…
+Рендер MP4…
+  сцена 1/8: 6.7 c
+  сцена 2/8: 12.1 c
+  сцена 3/8: 7.3 c
+  сцена 4/8: 8.9 c
+  сцена 5/8: 9.5 c
+  сцена 6/8: 11.6 c
+  сцена 7/8: 9.1 c
+  сцена 8/8: 6.6 c
+Готово: /home/runner/work/tiktok-bot/tiktok-bot/out/20261121-104655/video.mp4 (8.4 МБ, 71 с)
+Публикация выключена или нет TIKTOK_REFRESH_TOKEN — только рендер
