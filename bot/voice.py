@@ -61,13 +61,36 @@ def attach_punctuation(text: str, words: list[dict]) -> list[dict]:
     return words
 
 
+def _gtts(text: str, lang: str, out: Path) -> None:
+    from gtts import gTTS
+
+    gTTS(text=text, lang=lang).save(str(out))
+
+
 def synthesize(cfg: dict, text: str, out_dir: Path) -> tuple[Path, list[dict], float]:
     v = cfg["voice"]
     out = out_dir / "voice.mp3"
-    words = asyncio.run(_edge(text, v["name"], v["rate"], v["pitch"], out))
+    words = None
+    attempts = [
+        (v["name"], v["rate"], v["pitch"]),
+        (v["name"], "+0%", "+0Hz"),
+        ("ru-RU-SvetlanaNeural", "+0%", "+0Hz"),
+    ]
+    for name, rate, pitch in attempts:
+        try:
+            words = asyncio.run(_edge(text, name, rate, pitch, out))
+            log(f"Озвучка: edge-tts {name}")
+            break
+        except Exception as e:  # сервис Microsoft иногда не отвечает облачным серверам
+            log(f"edge-tts {name}: {type(e).__name__}: {e}")
+            words = None
+    if words is None:
+        log("Озвучка: запасной голос Google (gTTS)")
+        _gtts(text, cfg["channel"].get("language", "ru"), out)
+        words = []
     duration = audio_duration(out)
     if len(words) < len(text.split()) * 0.6:
-        log("edge-tts не вернул тайминги слов — оцениваю по длине")
+        log("Нет таймингов слов — оцениваю по длине")
         words = estimate_words(text, duration)
     else:
         words = attach_punctuation(text, words)
