@@ -33,16 +33,18 @@ jobs:
         run: |
           if [ -z "$CODE" ]; then
             mkdir -p reports
-            python -m bot.main auth-url | tail -1 > reports/auth_url.txt
-            cat reports/auth_url.txt
+            python -m bot.main auth-url > reports/auth_log.txt 2>&1 || true
+            grep -o 'https://www.tiktok.com/v2/auth/authorize/[^ ]*' reports/auth_log.txt | tail -1 > reports/auth_url.txt || true
+            cat reports/auth_log.txt
           else
             echo "::add-mask::$CODE"
             python -m bot.main auth-exchange "$CODE"
           fi
       - name: Сохранить
+        if: always()
         run: |
           git config user.name "tiktok-bot"
           git config user.email "tiktok-bot@users.noreply.github.com"
-          git add data/tiktok_token.enc reports/auth_url.txt 2>/dev/null || true
+          git add data/tiktok_token.enc reports/auth_url.txt reports/auth_log.txt 2>/dev/null || true
           git diff --cached --quiet || git commit -m "bot: токен TikTok (зашифрован)"
           git pull --rebase -q && git push -q
