@@ -6,6 +6,9 @@ on:
     - cron: "17 6 * * *"
     - cron: "47 15 * * *"
   workflow_dispatch: {}
+  # Ручной запуск через коммит: измените файл .run (так его может запускать и Claude)
+  push:
+    paths: [".run"]
 
 permissions:
   contents: write
@@ -39,7 +42,30 @@ jobs:
           TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
           TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
           GH_PAT: ${{ secrets.GH_PAT }}
-        run: python -m bot.main run
+        run: |
+          set -o pipefail
+          python -m bot.main run 2>&1 | tee run.log
+
+      - name: Журнал запуска (без секретов)
+        if: always()
+        env:
+          S1: ${{ secrets.ANTHROPIC_API_KEY }}
+          S2: ${{ secrets.PEXELS_API_KEY }}
+          S3: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          S4: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+          S5: ${{ secrets.GH_PAT }}
+        run: |
+          mkdir -p reports
+          python - <<'PY'
+          import os, re
+          log = open("run.log", encoding="utf-8", errors="replace").read() if os.path.exists("run.log") else "нет журнала"
+          for k in ("S1", "S2", "S3", "S4", "S5"):
+              v = os.environ.get(k)
+              if v and len(v) > 6:
+                  log = log.replace(v, "***")
+          log = re.sub(r"(sk-ant-|act\.|rft\.|github_pat_|ghp_)[A-Za-z0-9_\-\.!*]+", r"\1***", log)
+          open("reports/last_run.log", "w", encoding="utf-8").write(log[-20000:])
+          PY
 
       - name: Сохранить ролик (доступен 14 дней во вкладке Actions)
         if: always()
