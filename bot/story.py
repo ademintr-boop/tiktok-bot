@@ -15,7 +15,33 @@ SYSTEM = """Ты — сценарист вертикальных видео дл
 - Никаких реальных имён живых людей, брендов и реальных преступлений. История вымышленная.
 - Никакой жестокости в деталях, контент 13+.
 - Концовка — неожиданный поворот или открытый вопрос, провоцирующий комментарии.
-Отвечай ТОЛЬКО валидным JSON без пояснений."""
+Результат передай через инструмент submit_story."""
+
+TOOL = {
+    "name": "submit_story",
+    "description": "Передать готовый сценарий ролика",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "title": {"type": "string", "description": "короткое название до 60 символов"},
+            "hook_style": {"type": "string", "enum": ["вопрос", "шок-факт", "от первого лица", "интрига"]},
+            "scenes": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "text": {"type": "string", "description": "текст для озвучки, 1-3 предложения"},
+                        "search_query": {"type": "string", "description": "2-4 English words for a vertical stock background video, no faces"},
+                    },
+                    "required": ["text", "search_query"],
+                },
+            },
+            "caption": {"type": "string", "description": "подпись до 120 символов с вопросом к зрителям"},
+            "hashtags": {"type": "array", "items": {"type": "string"}},
+        },
+        "required": ["title", "hook_style", "scenes", "caption", "hashtags"],
+    },
+}
 
 SCHEMA = """{
   "title": "короткое название, до 60 символов",
@@ -44,8 +70,7 @@ def build_prompt(cfg: dict, topic: str, insights: str, recent_titles: list[str])
 Уже были ролики (не повторяй сюжеты и названия):
 {recent}
 
-Верни JSON строго по схеме:
-{SCHEMA}"""
+Передай результат через инструмент submit_story."""
 
 
 def _extract_json(text: str) -> dict:
@@ -68,6 +93,8 @@ def generate_story(cfg: dict, topic: str, insights: str, recent_titles: list[str
                 "max_tokens": 2000,
                 "system": SYSTEM,
                 "messages": [{"role": "user", "content": prompt}],
+                "tools": [TOOL],
+                "tool_choice": {"type": "tool", "name": "submit_story"},
             },
             timeout=120,
         )
@@ -75,9 +102,14 @@ def generate_story(cfg: dict, topic: str, insights: str, recent_titles: list[str
             last_err = f"Claude API {r.status_code}: {r.text[:300]}"
             log(last_err)
             continue
-        text = "".join(b.get("text", "") for b in r.json()["content"] if b.get("type") == "text")
+        body = r.json()
         try:
-            story = _extract_json(text)
+            block = next((b for b in body.get("content", []) if b.get("type") == "tool_use"), None)
+            if not block:
+                raise ValueError(f"нет tool_use, stop_reason={body.get('stop_reason')}")
+            story = block["input"]
+            if isinstance(story, str):
+                story = _extract_json(story)
             validate(story)
             story["topic"] = topic
             return story
