@@ -49,10 +49,10 @@
   },
   {
     "date": "2026-11-27",
+    "following_count": 0,
+    "likes_count": 0,
     "video_count": 0,
     "display_name": "Claude#1",
-    "follower_count": 0,
-    "following_count": 0,
-    "likes_count": 0
+    "follower_count": 0
   }
 ]
